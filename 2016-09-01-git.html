@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+            
+        <title>Introduction to Version Control using Git and Gitlab</title>
+
+
+        <meta name="author" content="Rémi Emonet">
+        <meta name="venue" content="Presentation in Laboratoire Hubert Curien">
+        <meta name="date" content="2016-09-01">
+        <meta name="affiliation" content="Université Jean Monnet  Laboratoire Hubert Curien">
+
+        <style type="text/css">
+blockquote {padding: .3em !important;}
+blockquote p {font-size: 40%}
+blockquote cite {float: right; font-size: 40% !important;}
+pre, .slide li strong {background: #EFE; color: #000;} /* TODO: change for export/printing */
+
+
+.inred {color: red !important;}
+
+body div.deck-container .title-slide {
+    border: none;
+    background: url(media/logos/ujm-10.svg) bottom left no-repeat, url(media/logos/hcurien.svg) bottom right no-repeat;
+}
+body div.deck-container .title-slide.with-final {
+    border: none;
+    background: url(media/git/final.png) center/20% no-repeat, url(media/logos/ujm-10.svg) bottom left no-repeat, url(media/logos/hcurien.svg) bottom right no-repeat;
+}
+
+.deck-container .slide.ujm {
+    background: url(media/logos/ujm-10.svg) bottom 30px left 30px/50px no-repeat;
+}
+        </style>
+
+        
+        <!--
+        <style type="text/css">
+.deck-container.black-bg { background: black !important; }
+.deck-container:not(.black-bg) { transition: 300ms ease-in background; background: default; }
+
+.title-slide h2, .title-slide ul {
+   box-shadow: 0px 0px 20px rgba(255,255,255, 0.8);
+}
+.fancy-slide h2, .fancy-slide ul {
+   color: white;
+}
+.fancy-slide ul {
+   padding: 0.5em; background: rgba(0,0,0,0.8);
+   border-radius: 3px;
+   list-style: none !important;
+}
+.fancy-slide.bot ul {
+   position: absolute; left: 20px; bottom: 20px; margin:0;
+}
+.fancy-slide.top ul {
+   position: absolute; right: 20px; top: 20px; margin:0;
+}
+.title-slide ul {
+   position: absolute; right: 30px; left: auto; bottom: 30px;
+}
+
+.plan h2 span { font-size: 80%; }
+.plan ul { font-size: 200%; }
+
+.tunedel del {position: relative; text-decoration: none;}
+.tunedel del::after { content:'' ; position:absolute; top: 60%; left: 0; right:0; border-bottom: 3px solid #F44; transform: rotate(-10deg);}
+.tunedel sup {color: #F44;}
+
+          .FS {
+              position: fixed !important;
+              left:0; width:100% !important;
+              top:0; height:100% !important;
+              background: white;
+              z-index: 1; /* in front of katex equations */
+          }
+          .FS svg {
+          }
+          
+
+
+.latex {color: #007;}
+.captain {font-size: 80%;}
+
+        </style>
+-->
+        <script src="deck-packed.js"></script>
+        <!--script src="extensions/slides.js"></script-->
+        <script>
+    includedeck([
+        "media/style.css",
+    ], {
+                AFTERINIT: function() {
+                    $(".hasSVG").each(function(i, e) {
+                        $(e).click(function() {
+                            $(e).toggleClass('FS');
+                        });
+                    });
+                },
+AFTERSMARTDOWN: function(){
+    $(".deck-container>.libyli li:not(li li):not(.notslide)").addClass("slide");
+    $("li.libyli>ul>li:not(.notslide)").addClass("slide");
+    $("#plan").detach();
+}});
+        </script>
+    </head>
+
+<body>
+
+<div class="deck-container">
+
+    <div class="deck-loading-splash" style="background: black; color: chartreuse;"><span class="vcenter" style="font-size: 30px; font-family: Arial; ">Please wait, while our marmots are preparing the hot chocolate…</span></div>
+
+<section class="smart">
+
+# <span class="var-title-br"></span> {/no-status title-slide with-final} // commentaire
+-  
+-  
+- <span class="var-author"></span> − <span class="var-date"></span>
+- <span class="var-affiliation"></span>
+
+## Version Control with Git: Overview {#plan overview}
+- Introduction to Version Control and Git {vcs}
+- Git basics {git}
+- Schyzophrenic Git {multigit}
+- Collaborating using Git and GitLab (or github) {gitlab}
+- Summing it up {concl}
+
+
+<!-- ####################################### -->
+# @copy:#plan:
+
+## About You {libyli}
+- Who already knows Git?
+- Who knows any of these?
+  - CVS, Subversion,
+  - Mercurial, Baz, GnuArch
+
+## About This Presentation {libyli}
+- Objectives
+  - get convinced by version control systems
+  - learn practical Git skills
+  - learn about GitLab for collaboration
+  - hands on with some “code” : a LaTeX paper
+- Don't Hesitate {libyli}
+  - to ask questions
+  - to interrupt me
+  - to ping me after, when trying to practice
+
+
+<!-- ######################################## -->
+# @copy:#plan: %+class:inred: .vcs
+
+## Why? {*no-status image-fit bottom-left darkened}
+<div class="img" style="background-image: url(media/git/phd101212s.gif)" data-attribution="http://www.phdcomics.com/comics/archive/phd101212s.gif" data-attribution-content="@davclark (PhD comics)"></div>
+
+## Version Control: What? {libyli}
+- A version control system (VCS)
+  - records what you and your collaborators have done
+  - allows easy replication across machines
+  - allows you to easily see changes
+  - allows you to easily experiment new things
+- Why dropbox/google drive/... is not sufficient
+  - safety of your data
+  - ownership of your data
+  - semantics of your changes
+- Why CVS/Subversion might not be sufficient
+  - centralized : a host of the repository
+  - working in the train/plane/countryside
+  - speed limit
+- <blockquote ><p>SVN-Git migration in progress. 8h to retrieve full SVN history, <br/>less than 1min to push full history to Git (same network)!</p></blockquote> {no densequote}
+
+## Git {libyli}
+- <blockquote><p>Git (/ɡɪt/) is a distributed revision control and source code management (SCM) system with an emphasis on speed, data integrity, and support for distributed, non-linear workflows. Git was initially designed and developed by Linus Torvalds for Linux kernel development in 2005, and has since become the most widely adopted version control system for software development.</p><cite>wikipedia</cite></blockquote>{densequote}
+- History of Git
+  - open source
+  - initiated by Linus Torvalds
+  - first release: 7 April 2005
+  - version 2.9.3: 12 August 2016
+  - fast and efficient
+  - most used
+- Good alternative: mercurial (hg)
+
+
+<!-- ######################################## -->
+# @copy:#plan: %+class:inred: .git
+
+## Starting with Git {libyli}
+- Initializing your project <br/><pre>git init</pre>
+- What's up? <br/><pre>git status</pre>
+- Deciding what is relevant <br/> <pre>git add file1 file2 …<br/>git commit</pre>
+- first: <a href="#introduceyourself">introduce yourself</a>
+
+## Let's try it // script "simple.txt"
+<pre>cp -r base mypaper ; cd mypaper
+
+git init
+
+git status
+git add     mypaper.tex  cvpr.sty
+git status
+git commit
+git status
+
+... and more
+</pre>
+<a target="_blank" href="git-script/simple.txt">…</a>
+
+## Recap {libyli}
+* Beginning
+  <pre>git init<br/>git add ...<br/>git commit [-m ...]</pre>
+* Working
+  <pre>git status<br/>git add ...<br/>git commit [-m ...]</pre>
+
+
+## Recap 2 {libyli}
+- Keep your project clean: ignoring files
+  - **.gitignore** file(s)
+  - **blabla.* ** , **!blabla.my_precious**, ** *~**
+- What did I just modify?
+  <pre>git status<br/>git diff [...]</pre>
+- What happened?
+  <pre>git log</pre>
+
+## Nota Bene (vs CVS, Subversion) {libyli}
+- You have the complete repository
+  - have all commits locally
+  - commit often, fast and everywhere (train, plane, here)
+  - merge with 0-stress
+  - warning: commit ≠ backup
+- Need to “**git add**” modifications
+- Repository == project
+  - SVN has a big tree-shaped repository
+  - SVN allows to "checkout" any subtree
+  - Git works at the repository level
+  - you'll have a set of repository
+  - commits are at the repository level
+
+## Tools for Git
+- GUI 
+  - Bundled with git: `git gui` and `gitk` // maybe not anymore
+  - Many others (gitg, qgit, GitX, tortoisegit, Netbeans, ...)
+  - <a href="http://git-scm.com/downloads/guis">graphical user interfaces for Git</a>
+  - <a href="https://git.wiki.kernel.org/index.php/InterfacesFrontendsAndTools">huge list of frontends and tools</a>
+- Help for installation
+  - for Windows, use <a href="https://git-for-windows.github.io/">"gitbash"</a>
+  - details and video helper in <a href="https://swcarpentry.github.io/workshop-template/#git">the software carpentry instructions</a>
+
+## Customizing Git {#introduceyourself libyli}
+- Introducing yourself
+  <pre class="smaller">git config --global user.name  "John Doe"<br/>git config --global user.email john@doe.com</pre>
+- Fancy colors and shortcuts
+  <pre>git config --global color.ui true<br/><br/>git config --global alias.st status<br/>git config --global alias.ci commit</pre>
+- Configuration in **~/.gitconfig**
+- Software Carpentry help about <a href="http://swcarpentry.github.io/git-novice/02-setup/">configuring git</a>
+
+
+<!-- ######################################## -->
+# @copy:#plan: %+class:inred: .multigit
+
+## About History {libyli}
+- Remember **git log**?
+- Each commit is written in stone
+  - parent(s) commit
+  - modifications
+  - sha1sum (e.g.    cb6dc3cb1f4f5eb15c1d9b2b25ae741cd73c0554)
+<br/>
+- can be diff'ed against <br/><pre>git diff cb6dc3...</pre>
+- can be retreived <br/><pre>git checkout cb6dc3...</pre>
+
+## Back to the Future: parallel universes
+<pre>git log
+gitk    # or gitg
+
+git checkout 41474a33e098689b...
+
+emacs paper.tex
+git commit
+gitk
+gitk --all
+
+... and more
+</pre>
+<a target="_blank" href="git-script/branches.txt">…</a>
+
+## Recap
+- Branch
+  - a label for a commit
+  - automatically follows on new commit (**git commit**)
+- Always commit before merging
+  - commit is cheap, easy and local
+  - you never loose anything when merging // maybe your temper
+- Use of “sha1” or branch-name (e.g. brrrr)
+- Shortcuts (<a href="http://stackoverflow.com/a/2222920/2297277">about ^ and ~</a>)
+<pre>cb6dc3, brrrr, HEAD,<br/>HEAD^, HEAD~, HEAD~~, HEAD~2, HEAD~42,<br/>HEAD^2, cb6dc3^42, tagggg</pre>
+
+## Recap 2
+- Moving in the history
+<pre>git checkout sha1-or-branch-name</pre>
+- Creating a new branch at current position
+<pre>git checkout -b new-branch-name</pre>
+- Merging “brrrr” into “master”
+<pre>git checkout master<br/>git merge brrrr</pre>
+
+## Recap 3
+- Non-conflicting **git merge** ⇒ automatic commit
+- Conflicting **git merge**
+  - (partial merge)
+  - non-conflicting changes are automatically added
+  - you: solve conflict
+  - you: `git add`
+  - you: `git commit`
+<br/>
+- Exploring history
+  - **git log**
+  - **gitk [--all]**
+  - **git log --graph --decorate --oneline --all --color**
+
+# Best Practices {no-print}
+
+## Best Practices {libyli}
+- commit early and often
+- always commit before merge (or pull)
+- use meaningful commit messages
+  - first line is the short message (50 character)
+  - recommended reading <a href="http://chris.beams.io/posts/git-commit/">on commit messages</a>
+- avoid committing
+  - binary files that change often (NB: word/excel/... are binary) 
+  - generated files (that can be regenerated in a reasonable time)
+  - temporary files
+- keep your git status clean
+- don't put git repositories inside git repositories
+- <a target="_blank" href="http://sethrobertson.github.io/GitBestPractices/">more</a>
+
+## Best Practices for Latex {libyli}
+- Reviewing your changes
+  - check that it compiles and use git status (e.g., for missing images)
+  - use git diff and latexdiff
+  - use a spellchecker as you type
+- Normalizing your writing (in latex)
+  - Goals
+      - easier search
+      - easier reading
+      - better versioning
+  - the “one sentence per line” rule
+      - never put more than one sentence on one line
+      - avoid as much as possible to break a sentence on multiple lines (e.g., don't reflow/justify your tex file)
+  - don't put a % alone on a line (if you need a break, probably a paragraph break is good)
+  - remove spaces at end of lines
+  - remove all "  " (double space, makes search difficult)
+  - remove all " ~" (space tilda, typographically wrong)
+  - remove all "~ " (tilda space)
+
+<!-- ######################################## -->
+# @copy:#plan: %+class:inred: .gitlab
+
+## What is GitLab (and GitHub)
+- GitLab
+  - a company providing support and advanced features
+  - an open source project (Community Edition)
+  - a web application
+      - collaboration platform
+      - hosting git repositories
+      - visualizing repositories
+      - managing issues/tickets
+- <blockquote><p>GitLab offers git repository management, code reviews, issue tracking, activity feeds, wikis.</p></blockquote> {no densequote}
+
+## Let's Go
+- Create a repository on GitLab
+- Push our content
+  - link our repository to the remote repository (on GitLab)
+  - push the changes to this remote repository
+- On another machine
+  - clone the repository
+  - make changes, commit and push them
+- On this machine
+  - pull changes: fetch them and then merge
+
+## Recap GitLab (and Git remotes) {libyli}
+- GitLab project == git repository (+ wiki etc)
+- The local repository can be linked to some remote one(s)
+- When we `git clone`, a remote named `origin` is set up
+- When we `git fetch`, we download the remote changes
+- ... we can then use `git merge` to integrate them
+- ... or `git pull` that does fetch+merge
+- When we `git push`, we upload our history of changes to the remote
+- Reminder: always commit before merge or pull
+
+## More GitLab (additions to git) {libyli}
+- Groups
+  - groups of users (e.g., PhD student and supervisors)
+  - automatic access to the projects of the group
+- Forking
+  - take a repository on GitLab
+  - make a “personal” copy of this repository (still on GitLab)
+- Merge requests (pull requests in GitHub)
+  - ask for another repo to integrate changes from your fork
+- Issues
+  - bug
+  - questions
+  - feature requests
+- Wikis
+  - set of pages, in markdown
+  - (also accessible as a git repository)
+
+## Things to Know at UJM {ujm libyli}
+- SSH access is disabled
+  - always use "https://gitlab...." to clone your repository
+- To avoid typing your login every time
+  - add your user name and @ after https://
+  - e.g.,
+  - <tt>git clone https://**er1234h@**gitlab.univ-st-etienne.fr/remi.emonet/pyqtidoteach.git</tt> {denser no}
+  - in case you forgot, you can edit **.git/config**
+- In case of problems while pushing big sets of commits
+  - <pre>error: RPC failed; result=22, HTTP code = 411
+fatal: The remote end hung up unexpectedly</pre>
+  - just run **git config http.postBuffer 524288000**
+
+## How to Get an Account on GitLab {ujm libyli}
+- For people with a UJM account
+  - open a ticket and asking “to get an account on GitLab”
+  - wait until you're notified it has been done
+  - visit <a href="http://gitlab.univ-st-etienne.fr/">http://gitlab.univ-st-etienne.fr/</a>
+  - use your UJM login/pass to connect
+  - ignore the email you'll receive about validating your email
+- For other people (interns, external collaborators)
+  - a person from UJM needs to open a ticket asking for the account
+      - providing an email and a name (for each collaborator)
+  - upon creation, you receive your credentials
+  - to log in, visit https://gitlab.univ-st-etienne.fr/
+  - click on the “Standard” tab
+  - use the credentials you've been given
+- In the near future
+  - LDAP users: automatic access
+  - other users: unified management across all university services
+
+<!-- ######################################## -->
+# @copy:#plan: %+class:inred: .concl
+
+## Key Points {#key key deck-status-fake-end}
+- Version control
+  - keep track of what happened
+  - store semantic snapshots/versions of your “code”
+- Git
+  - “distributed” version control: you have a complete repository
+  - efficient and widely used
+  - one repository per project
+- GitLab : a place to share repositories (projects)
+  - visualization of the repositories, wiki pages, issue tracker, …
+  - groups of users (e.g., PhD student and supervisors)
+- Links
+  - <a href="http://pcottle.github.io/learnGitBranching/">interactive learning of branching in Git</a>
+  - <a href="http://git-scm.com/">official website</a>
+  - <a href="http://git-scm.com/downloads/guis">graphical user interfaces for Git</a>
+  - for <a href="http://www.youtube.com/watch?v=4XpnKHJAok8">Git by a git</a>, ask Linus Torvald
+  - <a href="http://git-scm.com/book">Pro Git book</a> (available online)
+
+## Correspondence git &rlarr; svn {libyli}
+- git commit &rlarr; none
+- git commit ; git push &rlarr; svn commit
+- git fetch &rlarr; none
+- git fetch ; git merge &rlarr; svn update
+- git pull == git fetch ; git merge
+-  {no}
+- NB: you can also use git to collaborate with SVN users, using "git svn"
+
+## Going further
+- git remote add
+- git tag
+- git rebase
+- git commit --amend
+- git reflog
+- git ls-files
+- git revert
+- git bisect
+
+
+
+                    
+</section>
+<!--
+                    
+## <span class="var-title-br"></span> {image-full top-left darkened /black-bg /no-status /first-slide title-slide fancy-slide bot}
+<div class="img" style="background-image: url('media/fractal-cubes.jpg')" data-scale=""></div>
+
+- <span class="var-author"></span>
+- <span class="var-date"></span>
+- <span class="var-affiliation-br"></span>
+
+
+## <span class="var-title">TITLE</span> {#plan plan overview /with-ujm}
+- The Curse of Dimensionality
+- Ockham's Razor
+- Notions of Simplicity
+- Conclusion
+
+# The Curse of Dimensionality
+
+## The Curse of Dimensionality {image-full top-left darkened /black-bg /no-status fancy-slide bot tunedel}
+<div class="img" style="background-image: url('media/curse-clockwork.jpg')" data-attribution="https://www.flickr.com/photos/68244807@N00/16488393913/sizes/l/" data-attribution-content="CC by jsbanks42 (Flickr)" data-scale=""></div>
+
+- High-dimensionality <del>is</del><sup>can be</sup> a mess.
+
+
+
+## Take-home Message {image-fit top-left darkened /black-bg /no-status /fancy-slide}
+<div class="img" style="background-image: url('media/take-home-cats.jpg')" data-attribution="https://www.flickr.com/photos/sometoast/4192895126/sizes/l" data-attribution-content="CC by someToast (Flickr)" data-scale=""></div>
+
+
+## Thank You!<br/><br/>Questions? {image-fit bottom-left darkened /black-bg /no-status /fancy-slide}
+<div class="img" style="background-image: url('media/voodoo.jpg')" data-attribution="https://www.flickr.com/photos/sarawerne/4975279002/sizes/l" data-attribution-content="CC by tech no logic (Flickr)" data-scale=""></div>
+
+# That's It!<br/>Questions? {deck-status-fake-end}
+
+
+# Attributions
+
+## jared {image-full bottom-left darkened /black-bg /no-status}
+<div class="img" style="background-image: url('media/fractal-cubes.jpg')" data-attribution="https://www.flickr.com/photos/generated/6313491064/sizes/l/" data-attribution-content="CC by jared (Flickr)" data-scale=""></div>
+
+## jsbanks42 {image-full bottom-left darkened /black-bg /no-status}
+<div class="img" style="background-image: url('media/curse-clockwork.jpg')" data-attribution="https://www.flickr.com/photos/68244807@N00/16488393913/sizes/l/" data-attribution-content="CC by jsbanks42 (Flickr)" data-scale=""></div>
+
+## tech no logic {image-full bottom-left darkened /black-bg /no-status}
+<div class="img" style="background-image: url('media/voodoo.jpg')" data-attribution="https://www.flickr.com/photos/sarawerne/4975279002/sizes/l" data-attribution-content="CC by tech no logic (Flickr)" data-scale=""></div>
+
+## Fixcinater {image-full bottom-left darkened /black-bg /no-status}
+<div class="img" style="background-image: url('simplicity/razor-brush.jpg')" data-attribution="https://www.flickr.com/photos/fixcinater/5475287408/sizes/o/" data-attribution-content="CC by Fixcinater (Flickr)" data-scale=""></div>
+
+## Arenamontanus {image-fit bottom-left darkened /black-bg /no-status}
+<div class="img" style="background-image: url('simplicity/rainbow-fractal.jpg')" data-attribution="https://www.flickr.com/photos/arenamontanus/3380622371/sizes/l" data-attribution-content="CC by Arenamontanus (Flickr)" data-scale=""></div>
+
+## Wikipedia {image-fit bottom-left darkened /black-bg /no-status}
+<div class="img" style="background-image: url('simplicity/jpeg2000.jpg')" data-attribution="https://commons.wikimedia.org/wiki/File:Jpeg2000_2-level_wavelet_transform-lichtenstein.png" data-attribution-content="CC (wikipedia)" data-scale=""></div>
+
+## someToast {image-fit bottom-left darkened /black-bg /no-status}
+<div class="img" style="background-image: url('media/take-home-cats.jpg')" data-attribution="https://www.flickr.com/photos/sometoast/4192895126/sizes/l" data-attribution-content="CC by someToast (Flickr)" data-scale=""></div>
+
+-->
+
+
+</section>
+
+
+    <p class="deck-status" data-progress-size=": spe.top(10, 585) ; bottom: slide.top" style="z-index: 0; color: #339; background: #EEE;"> <span class="deck-status-current"></span> / <span class="deck-status-total"></span> − <span class="var-author">will be replaced by the author</span> − <span class="var-title">will be replaced by the title</span></p>
+
+    <a data-progress-size=": spe.top(15, 555); height: 45*designRatio; left: slide.right - 70*designRatio; width: 70*designRatio" class="ccby" href="http://en.wikipedia.org/wiki/Creative_Commons_license" title="This work is under CC-BY licence." target="_blank"></a>
+
+    <a class="ujm" data-progress-size=": spe.top(15, 515); height: 65*designRatio; left: slide.left; width: 130*designRatio" target="_blank"></a> <!-- shown only if with-ujm is set on the container -->
+    <a class="hcurien" data-progress-size=": spe.top(15, 470); height: 105*designRatio; left: slide.right - 160*designRatio; width: 150*designRatio" target="_blank"></a> <!-- shown only if with-ujm is set on the container -->
+
+</div>
+</body>
+</html>

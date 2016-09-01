@@ -1,0 +1,21 @@
+(approximative)
+
+
+- log in
+- create a project
+- select https
+- do what they say + explain the -u + draw everything
+- push show
+
+
+2
+- clone somewhere else
+- commit, push
+
+1
+- log -> rien
+- fetch, log -> sont là origin/master
+- merge origin/master -> comme d'hab
+- push
+
+

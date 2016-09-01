@@ -1,0 +1,40 @@
+ - get a copy of the folder (base -> 2016-thesis)
+ - show the files (eg, run: tree)
+
+ - run: git init
+ - run: git status
+
+ - run: git add paper.tex cvpr.sty
+ - run: git status
+ - run: git commit
+ -- short message, motivate the commit
+ -- and long message
+ - run: git status
+ - run: git add images/
+ - run: git commit -m "Adding the image file"
+ -- only short, motivate the commit
+
+ - run: pdflatex paper.tex
+ - do show the pdf, out of curiosity, with evince/xreader
+ - run: git status
+ - Q: what do we do with these? => ignore them, do not commit
+ - edit: .gitignore
+ -- add: paper*
+ -- add: *~
+ -- add: !*.tex
+ - run: git status   # (en live pendant l'edit)
+ - Q: what do we do with .gitignore? => commit it
+ - run: git add .gitignore
+ - run: git commit -m "Ignoring some generated files"
+ 
+ - edit: the tex file, add: \includegraphics[width=5cm]{a_bird.png}
+ - run: pdflatex paper.tex
+ - run: acroread paper.pdf
+ - run: git status
+ - run: git diff
+ - run: git commit    # rien a commiter
+ - run: git add paper.tex
+ - run: git commit -m "Added image reference in paper"
+ - run: git log
+ - (opt) run: git log --oneline
+
